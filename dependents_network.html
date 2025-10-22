@@ -1,0 +1,189 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 850px;
+                 background-color: #f8fafc;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 4, "globalDependents": 207, "id": "semver", "label": "semver", "shape": "dot", "size": 9.5, "title": "semver \u2014 direct dependents (global): 207"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "tap", "label": "tap", "shape": "dot", "size": 8.0, "title": "tap \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 10, "globalDependents": 189, "id": "chalk", "label": "chalk", "shape": "dot", "size": 15.5, "title": "chalk \u2014 direct dependents (global): 189"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 740, "id": "@types/node", "label": "@types/node", "shape": "dot", "size": 8.0, "title": "@types/node \u2014 direct dependents (global): 740"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "ava", "label": "ava", "shape": "dot", "size": 8.0, "title": "ava \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "c8", "label": "c8", "shape": "dot", "size": 8.0, "title": "c8 \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "tsd", "label": "tsd", "shape": "dot", "size": 8.0, "title": "tsd \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "xo", "label": "xo", "shape": "dot", "size": 8.0, "title": "xo \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 10, "globalDependents": 146, "id": "glob", "label": "glob", "shape": "dot", "size": 11.0, "title": "glob \u2014 direct dependents (global): 146"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 10, "globalDependents": 554, "id": "rimraf", "label": "rimraf", "shape": "dot", "size": 18.5, "title": "rimraf \u2014 direct dependents (global): 554"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 349, "id": "eslint-config-prettier", "label": "eslint-config-prettier", "shape": "dot", "size": 8.0, "title": "eslint-config-prettier \u2014 direct dependents (global): 349"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 116, "globalDependents": 713, "id": "prettier", "label": "prettier", "shape": "dot", "size": 32.0, "title": "prettier \u2014 direct dependents (global): 713"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 44, "globalDependents": 238, "id": "ts-node", "label": "ts-node", "shape": "dot", "size": 21.5, "title": "ts-node \u2014 direct dependents (global): 238"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 1154, "id": "typescript", "label": "typescript", "shape": "dot", "size": 8.0, "title": "typescript \u2014 direct dependents (global): 1154"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 395, "id": "@babel/core", "label": "@babel/core", "shape": "dot", "size": 8.0, "title": "@babel/core \u2014 direct dependents (global): 395"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 298, "id": "@babel/preset-env", "label": "@babel/preset-env", "shape": "dot", "size": 8.0, "title": "@babel/preset-env \u2014 direct dependents (global): 298"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 307, "id": "@types/jest", "label": "@types/jest", "shape": "dot", "size": 8.0, "title": "@types/jest \u2014 direct dependents (global): 307"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 22, "globalDependents": 296, "id": "@typescript-eslint/eslint-plugin", "label": "@typescript-eslint/eslint-plugin", "shape": "dot", "size": 14.0, "title": "@typescript-eslint/eslint-plugin \u2014 direct dependents (global): 296"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "benchmark", "label": "benchmark", "shape": "dot", "size": 8.0, "title": "benchmark \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 2, "globalDependents": 207, "id": "cross-env", "label": "cross-env", "shape": "dot", "size": 8.0, "title": "cross-env \u2014 direct dependents (global): 207"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 98, "globalDependents": 1236, "id": "eslint", "label": "eslint", "shape": "dot", "size": 26.0, "title": "eslint \u2014 direct dependents (global): 1236"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 55, "globalDependents": 417, "id": "eslint-plugin-import", "label": "eslint-plugin-import", "shape": "dot", "size": 26.0, "title": "eslint-plugin-import \u2014 direct dependents (global): 417"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 6, "globalDependents": 477, "id": "jest", "label": "jest", "shape": "dot", "size": 8.0, "title": "jest \u2014 direct dependents (global): 477"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 23, "globalDependents": 148, "id": "npm-run-all", "label": "npm-run-all", "shape": "dot", "size": 17.0, "title": "npm-run-all \u2014 direct dependents (global): 148"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 146, "id": "@types/react", "label": "@types/react", "shape": "dot", "size": 8.0, "title": "@types/react \u2014 direct dependents (global): 146"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 209, "id": "lodash", "label": "lodash", "shape": "dot", "size": 8.0, "title": "lodash \u2014 direct dependents (global): 209"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 36, "globalDependents": 518, "id": "nyc", "label": "nyc", "shape": "dot", "size": 15.5, "title": "nyc \u2014 direct dependents (global): 518"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 1, "globalDependents": 202, "id": "react", "label": "react", "shape": "dot", "size": 8.0, "title": "react \u2014 direct dependents (global): 202"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 17, "globalDependents": 331, "id": "chai", "label": "chai", "shape": "dot", "size": 11.0, "title": "chai \u2014 direct dependents (global): 331"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 29, "globalDependents": 260, "id": "lint-staged", "label": "lint-staged", "shape": "dot", "size": 23.0, "title": "lint-staged \u2014 direct dependents (global): 260"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 91, "globalDependents": 1111, "id": "mocha", "label": "mocha", "shape": "dot", "size": 35.0, "title": "mocha \u2014 direct dependents (global): 1111"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 30, "globalDependents": 224, "id": "sinon", "label": "sinon", "shape": "dot", "size": 20.0, "title": "sinon \u2014 direct dependents (global): 224"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 96, "globalDependents": 230, "id": "webpack", "label": "webpack", "shape": "dot", "size": 38.0, "title": "webpack \u2014 direct dependents (global): 230"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "istanbul", "label": "istanbul", "shape": "dot", "size": 8.0, "title": "istanbul \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 17, "globalDependents": 176, "id": "eslint-plugin-node", "label": "eslint-plugin-node", "shape": "dot", "size": 17.0, "title": "eslint-plugin-node \u2014 direct dependents (global): 176"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 19, "globalDependents": 211, "id": "eslint-plugin-prettier", "label": "eslint-plugin-prettier", "shape": "dot", "size": 12.5, "title": "eslint-plugin-prettier \u2014 direct dependents (global): 211"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 7, "globalDependents": 335, "id": "husky", "label": "husky", "shape": "dot", "size": 11.0, "title": "husky \u2014 direct dependents (global): 335"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 15, "globalDependents": 152, "id": "@rollup/plugin-node-resolve", "label": "@rollup/plugin-node-resolve", "shape": "dot", "size": 11.0, "title": "@rollup/plugin-node-resolve \u2014 direct dependents (global): 152"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "coveralls", "label": "coveralls", "shape": "dot", "size": 8.0, "title": "coveralls \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 67, "globalDependents": 423, "id": "rollup", "label": "rollup", "shape": "dot", "size": 33.5, "title": "rollup \u2014 direct dependents (global): 423"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 2, "globalDependents": 174, "id": "react-dom", "label": "react-dom", "shape": "dot", "size": 8.0, "title": "react-dom \u2014 direct dependents (global): 174"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 7, "globalDependents": 315, "id": "@typescript-eslint/parser", "label": "@typescript-eslint/parser", "shape": "dot", "size": 11.0, "title": "@typescript-eslint/parser \u2014 direct dependents (global): 315"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 0, "id": "standard", "label": "standard", "shape": "dot", "size": 8.0, "title": "standard \u2014 direct dependents (global): 0"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 0, "globalDependents": 276, "id": "tslib", "label": "tslib", "shape": "dot", "size": 8.0, "title": "tslib \u2014 direct dependents (global): 276"}, {"color": {"background": "#60a5fa", "border": "#1d4ed8", "highlight": {"background": "#f43f5e", "border": "#b91c1c"}}, "font": {"color": "#111", "size": 18}, "globalDependencies": 55, "globalDependents": 186, "id": "ts-jest", "label": "ts-jest", "shape": "dot", "size": 30.5, "title": "ts-jest \u2014 direct dependents (global): 186"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "semver", "to": "tap", "width": 1}, {"arrows": "to", "from": "chalk", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "chalk", "to": "ava", "width": 1}, {"arrows": "to", "from": "chalk", "to": "c8", "width": 1}, {"arrows": "to", "from": "chalk", "to": "tsd", "width": 1}, {"arrows": "to", "from": "chalk", "to": "xo", "width": 1}, {"arrows": "to", "from": "glob", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "glob", "to": "tap", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "c8", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "prettier", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "tap", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "ts-node", "width": 1}, {"arrows": "to", "from": "rimraf", "to": "typescript", "width": 1}, {"arrows": "to", "from": "prettier", "to": "chalk", "width": 1}, {"arrows": "to", "from": "prettier", "to": "semver", "width": 1}, {"arrows": "to", "from": "prettier", "to": "typescript", "width": 1}, {"arrows": "to", "from": "prettier", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "prettier", "to": "@babel/preset-env", "width": 1}, {"arrows": "to", "from": "prettier", "to": "@types/jest", "width": 1}, {"arrows": "to", "from": "prettier", "to": "@typescript-eslint/eslint-plugin", "width": 1}, {"arrows": "to", "from": "prettier", "to": "benchmark", "width": 1}, {"arrows": "to", "from": "prettier", "to": "cross-env", "width": 1}, {"arrows": "to", "from": "prettier", "to": "eslint", "width": 1}, {"arrows": "to", "from": "prettier", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "prettier", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "prettier", "to": "jest", "width": 1}, {"arrows": "to", "from": "prettier", "to": "npm-run-all", "width": 1}, {"arrows": "to", "from": "prettier", "to": "prettier", "width": 1}, {"arrows": "to", "from": "prettier", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "@types/react", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "ava", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "lodash", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "nyc", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "react", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "semver", "width": 1}, {"arrows": "to", "from": "ts-node", "to": "typescript", "width": 1}, {"arrows": "to", "from": "eslint", "to": "chalk", "width": 1}, {"arrows": "to", "from": "eslint", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "eslint", "to": "@babel/preset-env", "width": 1}, {"arrows": "to", "from": "eslint", "to": "c8", "width": 1}, {"arrows": "to", "from": "eslint", "to": "chai", "width": 1}, {"arrows": "to", "from": "eslint", "to": "eslint", "width": 1}, {"arrows": "to", "from": "eslint", "to": "glob", "width": 1}, {"arrows": "to", "from": "eslint", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "eslint", "to": "mocha", "width": 1}, {"arrows": "to", "from": "eslint", "to": "semver", "width": 1}, {"arrows": "to", "from": "eslint", "to": "sinon", "width": 1}, {"arrows": "to", "from": "eslint", "to": "webpack", "width": 1}, {"arrows": "to", "from": "chai", "to": "istanbul", "width": 1}, {"arrows": "to", "from": "chai", "to": "mocha", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "@babel/preset-env", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "eslint", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "eslint-plugin-node", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "eslint-plugin-prettier", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "husky", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "jest", "width": 1}, {"arrows": "to", "from": "lint-staged", "to": "prettier", "width": 1}, {"arrows": "to", "from": "mocha", "to": "glob", "width": 1}, {"arrows": "to", "from": "mocha", "to": "@rollup/plugin-node-resolve", "width": 1}, {"arrows": "to", "from": "mocha", "to": "chai", "width": 1}, {"arrows": "to", "from": "mocha", "to": "coveralls", "width": 1}, {"arrows": "to", "from": "mocha", "to": "cross-env", "width": 1}, {"arrows": "to", "from": "mocha", "to": "eslint", "width": 1}, {"arrows": "to", "from": "mocha", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "mocha", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "mocha", "to": "eslint-plugin-node", "width": 1}, {"arrows": "to", "from": "mocha", "to": "eslint-plugin-prettier", "width": 1}, {"arrows": "to", "from": "mocha", "to": "husky", "width": 1}, {"arrows": "to", "from": "mocha", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "mocha", "to": "nyc", "width": 1}, {"arrows": "to", "from": "mocha", "to": "prettier", "width": 1}, {"arrows": "to", "from": "mocha", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "mocha", "to": "rollup", "width": 1}, {"arrows": "to", "from": "mocha", "to": "sinon", "width": 1}, {"arrows": "to", "from": "mocha", "to": "webpack", "width": 1}, {"arrows": "to", "from": "sinon", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "sinon", "to": "husky", "width": 1}, {"arrows": "to", "from": "sinon", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "sinon", "to": "mocha", "width": 1}, {"arrows": "to", "from": "sinon", "to": "nyc", "width": 1}, {"arrows": "to", "from": "sinon", "to": "prettier", "width": 1}, {"arrows": "to", "from": "sinon", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "sinon", "to": "semver", "width": 1}, {"arrows": "to", "from": "webpack", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "webpack", "to": "@types/jest", "width": 1}, {"arrows": "to", "from": "webpack", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "webpack", "to": "benchmark", "width": 1}, {"arrows": "to", "from": "webpack", "to": "coveralls", "width": 1}, {"arrows": "to", "from": "webpack", "to": "eslint", "width": 1}, {"arrows": "to", "from": "webpack", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "webpack", "to": "eslint-plugin-node", "width": 1}, {"arrows": "to", "from": "webpack", "to": "eslint-plugin-prettier", "width": 1}, {"arrows": "to", "from": "webpack", "to": "husky", "width": 1}, {"arrows": "to", "from": "webpack", "to": "istanbul", "width": 1}, {"arrows": "to", "from": "webpack", "to": "jest", "width": 1}, {"arrows": "to", "from": "webpack", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "webpack", "to": "lodash", "width": 1}, {"arrows": "to", "from": "webpack", "to": "nyc", "width": 1}, {"arrows": "to", "from": "webpack", "to": "prettier", "width": 1}, {"arrows": "to", "from": "webpack", "to": "react", "width": 1}, {"arrows": "to", "from": "webpack", "to": "react-dom", "width": 1}, {"arrows": "to", "from": "webpack", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "webpack", "to": "typescript", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/eslint-plugin", "to": "semver", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/eslint-plugin", "to": "chalk", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/eslint-plugin", "to": "prettier", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/eslint-plugin", "to": "typescript", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "semver", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "@typescript-eslint/parser", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "chai", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "cross-env", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "eslint", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "glob", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "mocha", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "nyc", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "sinon", "width": 1}, {"arrows": "to", "from": "eslint-plugin-import", "to": "typescript", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "chalk", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "eslint", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "mocha", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "nyc", "width": 1}, {"arrows": "to", "from": "npm-run-all", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/parser", "to": "glob", "width": 1}, {"arrows": "to", "from": "@typescript-eslint/parser", "to": "typescript", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "semver", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "eslint", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "eslint-plugin-node", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "mocha", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "nyc", "width": 1}, {"arrows": "to", "from": "eslint-plugin-node", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "eslint-plugin-prettier", "to": "@typescript-eslint/parser", "width": 1}, {"arrows": "to", "from": "eslint-plugin-prettier", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "eslint-plugin-prettier", "to": "mocha", "width": 1}, {"arrows": "to", "from": "husky", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "husky", "to": "typescript", "width": 1}, {"arrows": "to", "from": "nyc", "to": "glob", "width": 1}, {"arrows": "to", "from": "nyc", "to": "rimraf", "width": 1}, {"arrows": "to", "from": "nyc", "to": "coveralls", "width": 1}, {"arrows": "to", "from": "nyc", "to": "standard", "width": 1}, {"arrows": "to", "from": "nyc", "to": "tap", "width": 1}, {"arrows": "to", "from": "rollup", "to": "@rollup/plugin-node-resolve", "width": 1}, {"arrows": "to", "from": "rollup", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "rollup", "to": "@typescript-eslint/eslint-plugin", "width": 1}, {"arrows": "to", "from": "rollup", "to": "@typescript-eslint/parser", "width": 1}, {"arrows": "to", "from": "rollup", "to": "eslint", "width": 1}, {"arrows": "to", "from": "rollup", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "rollup", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "rollup", "to": "eslint-plugin-prettier", "width": 1}, {"arrows": "to", "from": "rollup", "to": "husky", "width": 1}, {"arrows": "to", "from": "rollup", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "rollup", "to": "mocha", "width": 1}, {"arrows": "to", "from": "rollup", "to": "nyc", "width": 1}, {"arrows": "to", "from": "rollup", "to": "prettier", "width": 1}, {"arrows": "to", "from": "rollup", "to": "rollup", "width": 1}, {"arrows": "to", "from": "rollup", "to": "semver", "width": 1}, {"arrows": "to", "from": "rollup", "to": "tslib", "width": 1}, {"arrows": "to", "from": "rollup", "to": "typescript", "width": 1}, {"arrows": "to", "from": "@rollup/plugin-node-resolve", "to": "@babel/core", "width": 1}, {"arrows": "to", "from": "@rollup/plugin-node-resolve", "to": "rollup", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "semver", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "@types/node", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "@types/react", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "@typescript-eslint/eslint-plugin", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "@typescript-eslint/parser", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "eslint", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "eslint-config-prettier", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "eslint-plugin-import", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "eslint-plugin-prettier", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "glob", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "husky", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "jest", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "lint-staged", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "prettier", "width": 1}, {"arrows": "to", "from": "ts-jest", "to": "typescript", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"interaction": {"hover": true, "navigationButtons": true}, "nodes": {"shape": "dot", "scaling": {"label": {"enabled": true}}}, "edges": {"color": {"color": "#94a3b8", "highlight": "#ef4444", "hover": "#ef4444"}, "width": 1.2, "selectionWidth": 3, "smooth": {"type": "dynamic"}}, "physics": {"enabled": true, "barnesHut": {"gravitationalConstant": -20000, "centralGravity": 0.3, "springLength": 300, "springConstant": 0.02, "damping": 0.9}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
+<script type="text/javascript">
+function addClickEvent(network) {
+    // floating title
+    const header = document.createElement('div');
+    header.style.position = 'absolute';
+    header.style.top = '10px';
+    header.style.left = '50%';
+    header.style.transform = 'translateX(-50%)';
+    header.style.textAlign = 'center';
+    header.style.backgroundColor = 'rgba(255,255,255,0.9)';
+    header.style.padding = '8px 18px';
+    header.style.borderRadius = '10px';
+    header.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    header.style.fontFamily = 'Inter, sans-serif';
+    header.style.fontSize = '20px';
+    header.style.fontWeight = '600';
+    header.style.zIndex = '1000';
+    header.textContent = 'npm packages ranked 1–50 by direct dependents';
+    document.body.appendChild(header);
+
+    // info box
+    const infoBox = document.createElement('div');
+    infoBox.id = 'infoBox';
+    infoBox.style.position = 'absolute';
+    infoBox.style.bottom = '20px';
+    infoBox.style.left = '20px';
+    infoBox.style.backgroundColor = 'white';
+    infoBox.style.border = '1px solid #ddd';
+    infoBox.style.padding = '12px 16px';
+    infoBox.style.borderRadius = '10px';
+    infoBox.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+    infoBox.style.fontFamily = 'Inter, sans-serif';
+    infoBox.style.fontSize = '16px';
+    infoBox.style.zIndex = '999';
+    infoBox.innerHTML = '<b>click a node</b> to see its details.';
+    document.body.appendChild(infoBox);
+
+    // stop physics after stabilization
+    network.once("stabilizationIterationsDone", function () {
+        network.setOptions({ physics: false });
+    });
+
+    // click event to show global stats
+    network.on('click', function(params) {
+        if (params.nodes.length > 0) {
+            const nodeId = params.nodes[0];
+            const nodeData = network.body.data.nodes.get(nodeId);
+            const globalDependents = nodeData.globalDependents || 0;
+            const globalDependencies = nodeData.globalDependencies || 0;
+
+            document.getElementById('infoBox').innerHTML =
+              '<b>selected package:</b> ' + nodeId +
+              '<br><b>direct dependents (global):</b> ' + globalDependents +
+              '<br><b>dependencies (global):</b> ' + globalDependencies;
+        }
+    });
+}
+
+window.addEventListener("load", () => {
+    if (window.network) addClickEvent(window.network);
+});
+</script>
