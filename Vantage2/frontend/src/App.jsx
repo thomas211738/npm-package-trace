@@ -203,12 +203,12 @@ function App() {
 
               <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
 
-              <table className="w-full text-sm">
+              <table className="w-full text-sm table-fixed">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-2">SHA</th>
                     <th className="text-left p-2">Author</th>
-                    <th className="text-left p-2">Message</th>
+                    <th className="text-left p-2 w-2/5">Message</th>
                     <th className="text-left p-2">Score</th>
                     <th className="text-left p-2">Flags</th>
                   </tr>
@@ -218,7 +218,7 @@ function App() {
                     <tr key={c.sha} className="border-b">
                       <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
                       <td className="p-2">{c.authorName}</td>
-                      <td className="p-2 whitespace-normal break-words max-w-md">
+                      <td className="p-2 align-top whitespace-normal break-words">
                           {c.message}
                       </td>
                       <td className="p-2">
