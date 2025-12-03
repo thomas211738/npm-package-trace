@@ -8,9 +8,6 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # helps with rate limits
 
 
 def _github_headers(accept_diff: bool = False):
-    """
-    Build headers for GitHub API requests.
-    """
     headers = {
         "User-Agent": "npm-risk-scanner-python",
         "Accept": "application/vnd.github+json"
@@ -24,16 +21,33 @@ def _github_headers(accept_diff: bool = False):
 
 def get_recent_commits(owner: str, repo: str, n: int = 10):
     """
-    Fetch the last n commits (basic info) from a GitHub repo.
+    Fetch the last n commits. If n > 100, fetch multiple pages.
+    GitHub paginates commits 100 at a time.
     """
-    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits"
-    params = {"per_page": n}
-    resp = requests.get(url, headers=_github_headers(), params=params, timeout=15)
+    commits = []
+    page = 1
 
-    if resp.status_code != 200:
-        raise RuntimeError(f"GitHub commits API returned {resp.status_code} for {owner}/{repo}")
+    while len(commits) < n:
+        remaining = n - len(commits)
+        per_page = min(remaining, 100)  # GitHub max
 
-    return resp.json()
+        url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits"
+        params = {"per_page": per_page, "page": page}
+
+        resp = requests.get(url, headers=_github_headers(), params=params, timeout=15)
+        if resp.status_code != 200:
+            raise RuntimeError(
+                f"GitHub commits API returned {resp.status_code} for {owner}/{repo}"
+            )
+
+        page_commits = resp.json()
+        if not page_commits:
+            break  # no more commits available
+
+        commits.extend(page_commits)
+        page += 1
+
+    return commits[:n]
 
 
 def get_commit_diff(owner: str, repo: str, sha: str) -> str:
@@ -53,12 +67,7 @@ def get_commit_diff(owner: str, repo: str, sha: str) -> str:
 
 def get_recent_commits_with_diffs(owner: str, repo: str, n: int = 10):
     """
-    Fetch the last n commits, including:
-    - sha
-    - authorName
-    - authorEmail
-    - message
-    - diff (raw text)
+    Fetch last n commits and attach diffs.
     """
     basic_commits = get_recent_commits(owner, repo, n)
     results = []
@@ -68,18 +77,14 @@ def get_recent_commits_with_diffs(owner: str, repo: str, n: int = 10):
         commit_info = commit["commit"]
         author_info = commit_info.get("author") or {}
 
-        author_name = author_info.get("name")
-        author_email = author_info.get("email")
-        message = commit_info.get("message")
-
         diff = get_commit_diff(owner, repo, sha)
 
         results.append({
             "sha": sha,
-            "authorName": author_name,
-            "authorEmail": author_email,
-            "message": message,
-            "diff": diff
+            "authorName": author_info.get("name"),
+            "authorEmail": author_info.get("email"),
+            "message": commit_info.get("message"),
+            "diff": diff,
         })
 
     return results
