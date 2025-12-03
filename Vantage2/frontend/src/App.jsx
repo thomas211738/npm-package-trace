@@ -5,6 +5,12 @@ const getScoreColor = (score) => {
   if (score <= 60) return "bg-yellow-100 text-yellow-800";
   return "bg-red-100 text-red-800";
 };
+ const getFlagColor = (flag) => {
+  if (flag.includes("dependency")) return "bg-blue-100 text-blue-800";
+  if (flag.includes("encoded")) return "bg-purple-100 text-purple-800";
+  if (flag.includes("suspicious")) return "bg-red-100 text-red-800";
+  return "bg-gray-200 text-gray-700";
+};
 
 function App() {
   const [query, setQuery] = useState('');
@@ -215,7 +221,10 @@ function App() {
                 </thead>
                 <tbody>
                   {scanResults.commits.map((c) => (
-                    <tr key={c.sha} className="border-b">
+                    <tr 
+                      key={c.sha}
+                      className="border-b hover:bg-gray-50 transition-colors duration-200"
+                      >
                       <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
                       <td className="p-2">{c.authorName}</td>
                       <td className="p-2 whitespace-normal break-words">{c.message}</td>
@@ -228,9 +237,20 @@ function App() {
                           {c.risk_score}
                         </span>
                       </td>
-                      <td className="p-2">
-                        {c.flags?.length ? c.flags.join(", ") : "—"}
-                      </td>
+                      <td className="p-2 space-x-1 space-y-1">
+  {c.flags?.length ? (
+    c.flags.map((f, i) => (
+      <span
+        key={i}
+        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getFlagColor(f)}`}
+      >
+        {f}
+      </span>
+    ))
+  ) : (
+    "—"
+  )}
+</td>
                     </tr>
                   ))}
                 </tbody>
