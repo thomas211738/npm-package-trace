@@ -1,53 +1,57 @@
-# resolves an npm package name to a github repo
+# resolve an npm package name to a GitHub {owner, repo} pair by looking at the package metadata from the npm registry
 
+import re
 import requests
-from urllib.parse import urlparse
 
 NPM_REGISTRY_URL = "https://registry.npmjs.org"
 
 
-def resolve_repo_from_npm(package_name: str):
+def resolve_npm_package(package_name: str):
     """
-    Given an npm package name, return:
-      { "owner": "someuser", "repo": "somerepo" }
-    or None if no GitHub repo can be found.
+    Given an npm package name (e.g. "colors" or "event-stream"),
+    return a dict like:
+
+        { "owner": "someuser", "repo": "somerepo" }
+
+    by reading the "repository" or "homepage" fields from the
+    npm registry metadata and extracting the GitHub URL.
     """
+    if not package_name:
+        raise ValueError("package_name is required")
+
     url = f"{NPM_REGISTRY_URL}/{package_name}"
     resp = requests.get(url, timeout=10)
 
     if resp.status_code != 200:
-        raise RuntimeError(f"npm registry returned {resp.status_code} for package '{package_name}'")
+        raise RuntimeError(
+            f"npm registry returned {resp.status_code} for package '{package_name}'"
+        )
 
     data = resp.json()
 
-    # try top-level repository
-    repo = data.get("repository") or {}
-    repo_url = repo.get("url")
+    # try "repository" field first
+    repo_meta = data.get("repository") or {}
+    repo_url = repo_meta.get("url") or ""
 
-    # if missing, try latest version's repository field
-    if not repo_url:
-        dist_tags = data.get("dist-tags") or {}
-        latest_version = dist_tags.get("latest")
-        if latest_version:
-            versions = data.get("versions") or {}
-            version_info = versions.get(latest_version) or {}
-            repo2 = version_info.get("repository") or {}
-            repo_url = repo2.get("url")
+    # fallback: some packages only have "homepage" pointing to github
+    if "github.com" not in repo_url.lower():
+        homepage = data.get("homepage") or ""
+        if "github.com" in homepage.lower():
+            repo_url = homepage
 
-    if not repo_url:
-        return None
+    if not repo_url or "github.com" not in repo_url.lower():
+        raise RuntimeError(
+            f"Could not find a GitHub repository URL for npm package '{package_name}'"
+        )
 
-    # clean up repo url
-    repo_url = repo_url.replace("git+", "").strip()
-    if repo_url.endswith(".git"):
-        repo_url = repo_url[:-4]
+    # extract "owner/repo" from URLs 
+    m = re.search(r"github\.com[:/]+([^/]+)/([^/#\.]+)", repo_url)
+    if not m:
+        raise RuntimeError(
+            f"Failed to parse GitHub owner/repo from URL '{repo_url}'"
+        )
 
-    parsed = urlparse(repo_url)
-    parts = parsed.path.strip("/").split("/")
+    owner = m.group(1)
+    repo = m.group(2)
 
-    # expect something like "/owner/repo"
-    if len(parts) < 2:
-        return None
-
-    owner, repo = parts[0], parts[1]
     return {"owner": owner, "repo": repo}

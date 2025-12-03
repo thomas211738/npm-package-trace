@@ -1,5 +1,7 @@
 # talks to the github api to fetch commit history and diffs for a given repository
 
+from datetime import datetime
+
 import os
 import requests
 
@@ -62,12 +64,18 @@ def get_commit_diff(owner: str, repo: str, sha: str) -> str:
             f"GitHub diff API returned {resp.status_code} for {owner}/{repo}@{sha}"
         )
 
-    return resp.text
-
+    return resp.text  
 
 def get_recent_commits_with_diffs(owner: str, repo: str, n: int = 10):
     """
-    Fetch last n commits and attach diffs.
+    Fetch the last n commits, including:
+      - sha
+      - authorName
+      - authorEmail
+      - message
+      - date (ISO 8601 string)
+      - added_lines (how many + lines in the diff)
+      - diff (raw text)
     """
     basic_commits = get_recent_commits(owner, repo, n)
     results = []
@@ -77,14 +85,35 @@ def get_recent_commits_with_diffs(owner: str, repo: str, n: int = 10):
         commit_info = commit["commit"]
         author_info = commit_info.get("author") or {}
 
-        diff = get_commit_diff(owner, repo, sha)
+        author_name = author_info.get("name")
+        author_email = author_info.get("email")
+        message = commit_info.get("message")
+        date_str = author_info.get("date")  # e.g. "2021-09-18T12:34:56Z"
 
-        results.append({
-            "sha": sha,
-            "authorName": author_info.get("name"),
-            "authorEmail": author_info.get("email"),
-            "message": commit_info.get("message"),
-            "diff": diff,
-        })
+        try:
+            diff = get_commit_diff(owner, repo, sha)
+        except Exception:
+            diff = ""
+
+        # count added lines (ignore diff header +++ lines)
+        added_lines = 0
+        if diff:
+            for line in diff.splitlines():
+                if line.startswith("+++"):
+                    continue
+                if line.startswith("+"):
+                    added_lines += 1
+
+        results.append(
+            {
+                "sha": sha,
+                "authorName": author_name,
+                "authorEmail": author_email,
+                "message": message,
+                "date": date_str,
+                "added_lines": added_lines,
+                "diff": diff,
+            }
+        )
 
     return results
