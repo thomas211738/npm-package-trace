@@ -8,7 +8,7 @@ from services.github_commits import get_recent_commits_with_diffs
 from risk.score_commit import score_commit
 
 app = Flask(__name__)
-CORS(app,, resources={r"/*": {"origins": "http://localhost:5173"}})  # allow react frontend on a different port to call this api
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # allow react frontend on a different port to call this api
 
 
 @app.route("/scan", methods=["POST"])
