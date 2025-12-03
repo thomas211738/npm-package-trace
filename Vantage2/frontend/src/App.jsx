@@ -138,7 +138,14 @@ function App() {
                 className="bg-blue-600 text-white px-5 py-3 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={scanLoading}
               >
-                {scanLoading ? "Scanning..." : "Scan Package"}
+                {scanLoading ? (
+  <div className="flex items-center space-x-2">
+    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+    <span>Scanning...</span>
+  </div>
+) : (
+  "Scan Package"
+)}
               </button>
             </div>
 
@@ -258,8 +265,12 @@ function App() {
     </table>
   </div>
 )}
- </div>  
-  </div>    
+   </div>  
+  </div>  
+    <footer className="mt-10 text-gray-500 text-sm">
+  Built by Group 1 — Boston University EC521 (2025)
+</footer>
+
 </div>      
   );
 }
