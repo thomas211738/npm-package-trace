@@ -112,19 +112,19 @@ function App() {
 <div className="relative mb-10">
   <div className="flex">
     <input
-      type="number"
-      min="1"
-      max="100"
-      value={CommitDepth}
-      onChange={(e) => {
-  const val = e.target.value;
-  if (val === "") {
-    setCommitDepth("");
-    return;
-  }
-  setCommitDepth(Number(val));
-}}
-      className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  type="number"
+  min="1"
+  max="100"
+  value={commitDepth === "" ? "" : commitDepth}
+  onChange={(e) => {
+    const val = e.target.value;
+    if (val === "") {
+      setCommitDepth("");
+      return;
+    }
+    setCommitDepth(Number(val));
+  }}
+  className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
 />
       onFocus={() => query.length >= 2 && setShowDropdown(true)}
       onKeyDown={handleKeyDown}
