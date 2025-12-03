@@ -218,7 +218,9 @@ function App() {
                     <tr key={c.sha} className="border-b">
                       <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
                       <td className="p-2">{c.authorName}</td>
-                      <td className="p-2">{c.message}</td>
+                      <td className="p-2 whitespace-normal break-words max-w-md">
+                          {c.message}
+                      </td>
                       <td className="p-2">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
