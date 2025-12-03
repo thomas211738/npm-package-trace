@@ -256,9 +256,20 @@ function App() {
                 {c.risk_score}
               </span>
             </td>
-            <td className="p-2">
-              {c.flags?.length ? c.flags.join(', ') : "—"}
-            </td>
+            <td className="p-2 space-x-1 space-y-1">
+      {c.flags?.length ? (
+        c.flags.map((f, i) => (
+          <span
+           key={i}
+              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getFlagColor(f)}`}
+        >
+          {f}
+        </span>
+      ))
+    ) : (
+        "—"
+      )}
+    </td>
           </tr>
         ))}
       </tbody>
