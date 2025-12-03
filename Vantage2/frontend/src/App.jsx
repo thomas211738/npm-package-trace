@@ -203,7 +203,7 @@ function App() {
 
               <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
 
-              <table className="w-full text-sm table-auto">
+              <table className="w-full text-sm table-fixed">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-2">SHA</th>
