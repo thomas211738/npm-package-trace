@@ -37,6 +37,12 @@ function App() {
       }
     };
 
+    const getScoreColor = (score) => {
+  if (score <= 9) return "bg-green-100 text-green-800";
+  if (score <= 60) return "bg-yellow-100 text-yellow-800";
+  return "bg-red-100 text-red-800";
+};
+
     const debounceTimer = setTimeout(searchPackages, 300);
     return () => clearTimeout(debounceTimer);
   }, [query]);
