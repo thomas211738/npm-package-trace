@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 
+const getScoreColor = (score) => {
+  if (score <= 9) return "bg-green-100 text-green-800";
+  if (score <= 60) return "bg-yellow-100 text-yellow-800";
+  return "bg-red-100 text-red-800";
+};
+
 function App() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -10,7 +16,7 @@ function App() {
   const inputRef = useRef(null);
   const [scanResults, setScanResults] = useState(null);
   const [scanLoading, setScanLoading] = useState(false);
-  const [scanError,setScanError]= useState(null);
+  const [scanError, setScanError] = useState(null);
 
   useEffect(() => {
     const searchPackages = async () => {
@@ -37,12 +43,6 @@ function App() {
       }
     };
 
-    const getScoreColor = (score) => {
-  if (score <= 9) return "bg-green-100 text-green-800";
-  if (score <= 60) return "bg-yellow-100 text-yellow-800";
-  return "bg-red-100 text-red-800";
-};
-
     const debounceTimer = setTimeout(searchPackages, 300);
     return () => clearTimeout(debounceTimer);
   }, [query]);
@@ -66,38 +66,40 @@ function App() {
     setQuery(pkg.package.name);
     setSelectedPackage(pkg.package);
     setShowDropdown(false);
+    setScanResults(null);
+    setScanError(null);
   };
 
-const handleSearch = async () => {
-  if (!selectedPackage?.name) return;
+  const handleSearch = async () => {
+    if (!selectedPackage?.name) return;
 
-  setScanLoading(true);
-  setScanError(null);
-  setScanResults(null);
+    setScanLoading(true);
+    setScanError(null);
+    setScanResults(null);
 
-  try {
-    const res = await fetch("http://localhost:5001/scan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        package: selectedPackage.name,
-        numCommits: 10
-      })
-    });
+    try {
+      const res = await fetch("http://localhost:5001/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          package: selectedPackage.name,
+          numCommits: 10
+        })
+      });
 
-    if (!res.ok) {
-      throw new Error(`Backend error: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Backend error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setScanResults(data);
+    } catch (err) {
+      console.error(err);
+      setScanError(err.message || "Unknown error");
+    } finally {
+      setScanLoading(false);
     }
-
-    const data = await res.json();
-    setScanResults(data);
-
-  } catch (err) {
-    setScanError(err.message);
-  } finally {
-    setScanLoading(false);
-  }
-};
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -128,6 +130,7 @@ const handleSearch = async () => {
               <button
                 onClick={handleSearch}
                 className="bg-blue-600 text-white px-5 py-3 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={scanLoading}
               >
                 {scanLoading ? "Scanning..." : "Scan Package"}
               </button>
@@ -179,7 +182,7 @@ const handleSearch = async () => {
               )}
             </div>
           )}
-        
+
           {scanError && (
             <div className="mt-4 text-red-600 text-center">
               Error: {scanError}
@@ -188,51 +191,52 @@ const handleSearch = async () => {
 
           {scanResults && (
             <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold mb-4">
-              Scan Results for {scanResults.package}
-            </h3>
+              <h3 className="text-xl font-bold mb-4">
+                Scan Results for {scanResults.package}
+              </h3>
 
-          <p className="text-gray-700 mb-2">
-          <strong>Repository:</strong> {scanResults.repo?.owner}/{scanResults.repo?.repo}
-          </p>
+              {scanResults.repo && (
+                <p className="text-gray-700 mb-2">
+                  <strong>Repository:</strong> {scanResults.repo.owner}/{scanResults.repo.repo}
+                </p>
+              )}
 
-          <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
+              <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
 
-          <table className="w-full text-sm">
-          <thead>
-          <tr className="border-b">
-          <th className="text-left p-2">SHA</th>
-          <th className="text-left p-2">Author</th>
-          <th className="text-left p-2">Message</th>
-          <th className="text-left p-2">Score</th>
-          <th className="text-left p-2">Flags</th>
-          </tr>
-          </thead>    
-          <tbody>
-          
-          {scanResults.commits.map((c) => (
-          <tr key={c.sha} className="border-b">
-            <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
-            <td className="p-2">{c.authorName}</td>
-            <td className="p-2">{c.message}</td>
-            <td className="p-2">
-  <span
-    className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
-      c.risk_score
-    )}`}
-  >
-    {c.risk_score}
-  </span>
-</td>
-            <td className="p-2">
-              {c.flags?.length ? c.flags.join(", ") : "—"}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">SHA</th>
+                    <th className="text-left p-2">Author</th>
+                    <th className="text-left p-2">Message</th>
+                    <th className="text-left p-2">Score</th>
+                    <th className="text-left p-2">Flags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scanResults.commits.map((c) => (
+                    <tr key={c.sha} className="border-b">
+                      <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
+                      <td className="p-2">{c.authorName}</td>
+                      <td className="p-2">{c.message}</td>
+                      <td className="p-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
+                            c.risk_score
+                          )}`}
+                        >
+                          {c.risk_score}
+                        </span>
+                      </td>
+                      <td className="p-2">
+                        {c.flags?.length ? c.flags.join(", ") : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
