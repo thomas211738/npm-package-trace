@@ -134,26 +134,20 @@ function App() {
                     Number of commits to scan:
                   </label>
                   <input
-  type="number"
-  min="1"
-  max="100"
-  value={commitDepth}
-  onChange={(e) => {
-    const val = e.target.value;
-    if (val === "") {
-      setCommitDepth("");
-      return;
-    }
-    setCommitDepth(Number(val));
-  }}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
-  }}
-  className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+                    type="number"
+                    min="1"
+                    max="500"
+                    value={commitDepth === "" ? "" : commitDepth}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setCommitDepth("");
+                        return;
+                      }
+                      setCommitDepth(Number(val));
+                    }}
+                    className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               )}
             </div>
