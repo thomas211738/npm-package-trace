@@ -208,7 +208,7 @@ function App() {
                   <tr className="border-b">
                     <th className="text-left p-2">SHA</th>
                     <th className="text-left p-2">Author</th>
-                    <th className="text-left p-2 w-3/5">Message</th>
+                    <th className="text-left p-2 w-2/5">Message</th>
                     <th className="text-left p-2">Score</th>
                     <th className="text-left p-2">Flags</th>
                   </tr>
