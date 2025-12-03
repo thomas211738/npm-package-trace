@@ -215,7 +215,15 @@ const handleSearch = async () => {
             <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
             <td className="p-2">{c.authorName}</td>
             <td className="p-2">{c.message}</td>
-            <td className="p-2 font-bold">{c.risk_score}</td>
+            <td className="p-2">
+  <span
+    className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
+      c.risk_score
+    )}`}
+  >
+    {c.risk_score}
+  </span>
+</td>
             <td className="p-2">
               {c.flags?.length ? c.flags.join(", ") : "—"}
             </td>
