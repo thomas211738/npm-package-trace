@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-const [showAdvanced, setShowAdvanced] = useState(false);
-const [commitDepth, setCommitDepth] = useState(10); 
 const getScoreColor = (score) => {
   if (score <= 9) return "bg-green-100 text-green-800";
   if (score <= 60) return "bg-yellow-100 text-yellow-800";
@@ -13,6 +11,8 @@ const getFlagColor = (flag) => {
   return "bg-gray-200 text-gray-700";
 };
 function App() {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [commitDepth, setCommitDepth] = useState(10); 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
