@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-
 const getScoreColor = (score) => {
   if (score <= 9) return "bg-green-100 text-green-800";
   if (score <= 60) return "bg-yellow-100 text-yellow-800";
   return "bg-red-100 text-red-800";
 };
- const getFlagColor = (flag) => {
+const getFlagColor = (flag) => {
   if (flag.includes("dependency")) return "bg-blue-100 text-blue-800";
   if (flag.includes("encoded")) return "bg-purple-100 text-purple-800";
   if (flag.includes("suspicious")) return "bg-red-100 text-red-800";
   return "bg-gray-200 text-gray-700";
 };
-
 function App() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -23,7 +21,6 @@ function App() {
   const [scanResults, setScanResults] = useState(null);
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState(null);
-
   useEffect(() => {
     const searchPackages = async () => {
       if (query.length < 2) {
@@ -31,10 +28,8 @@ function App() {
         setShowDropdown(false);
         return;
       }
-
       setIsLoading(true);
       setShowDropdown(true);
-
       try {
         const response = await fetch(
           `https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(query)}&size=5`
@@ -48,11 +43,9 @@ function App() {
         setIsLoading(false);
       }
     };
-
     const debounceTimer = setTimeout(searchPackages, 300);
     return () => clearTimeout(debounceTimer);
   }, [query]);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -63,11 +56,9 @@ function App() {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
   const handleSelectPackage = (pkg) => {
     setQuery(pkg.package.name);
     setSelectedPackage(pkg.package);
@@ -75,14 +66,11 @@ function App() {
     setScanResults(null);
     setScanError(null);
   };
-
   const handleSearch = async () => {
     if (!selectedPackage?.name) return;
-
     setScanLoading(true);
     setScanError(null);
     setScanResults(null);
-
     try {
       const res = await fetch("http://localhost:5001/scan", {
         method: "POST",
@@ -92,11 +80,9 @@ function App() {
           numCommits: 10
         })
       });
-
       if (!res.ok) {
         throw new Error(`Backend error: ${res.status}`);
       }
-
       const data = await res.json();
       setScanResults(data);
     } catch (err) {
@@ -106,13 +92,9 @@ function App() {
       setScanLoading(false);
     }
   };
-
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+    if (e.key === 'Enter') handleSearch();
   };
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
       <h1 className="text-4xl font-bold text-gray-800 mt-8">NPM Package Malware Detector</h1>
@@ -139,16 +121,15 @@ function App() {
                 disabled={scanLoading}
               >
                 {scanLoading ? (
-  <div className="flex items-center space-x-2">
-    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-    <span>Scanning...</span>
-  </div>
-) : (
-  "Scan Package"
-)}
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Scanning...</span>
+                  </div>
+                ) : (
+                  "Scan Package"
+                )}
               </button>
             </div>
-
             {showDropdown && query.length >= 2 && (
               <div
                 ref={dropdownRef}
@@ -178,7 +159,6 @@ function App() {
               </div>
             )}
           </div>
-
           {selectedPackage && (
             <div className="bg-white p-4 rounded-md shadow-md">
               <h3 className="text-lg font-bold text-gray-800 mb-2">Selected Package</h3>
@@ -195,94 +175,94 @@ function App() {
               )}
             </div>
           )}
-
-           {scanError && (
+          {scanError && (
             <div className="mt-4 text-red-600 text-center">
               Error: {scanError}
             </div>
           )}
           {scanResults && (
-  <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-    <div className="mb-6 p-4 rounded-lg bg-gray-50 border">
-      <h3 className="text-lg font-semibold mb-2">Risk Summary</h3>
-      {(() => {
-        const scores = scanResults.commits.map(c => c.risk_score);
-        const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
-        const highest = Math.max(...scores);
-        const summaryColor =
-          highest <= 9 ? "text-green-700" :
-          highest <= 60 ? "text-yellow-700" :
-          "text-red-700";
-        return (
-          <div className={`font-medium ${summaryColor}`}>
-            <p>Highest Commit Risk: <strong>{highest}</strong></p>
-            <p>Average Risk Score: <strong>{avg.toFixed(1)}</strong></p>
-            <p>Total Commits Scanned: <strong>{scores.length}</strong></p>
-          </div>
-        );
-      })()}
-    </div>
-    <h3 className="text-xl font-bold mb-4">
-      Scan Results for {scanResults.package}
-    </h3>
-    {scanResults.repo && (
-      <p className="text-gray-700 mb-2">
-        <strong>Repository:</strong> {scanResults.repo.owner}/{scanResults.repo.repo}
-      </p>
-    )}
-    <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
-    <table className="w-full text-sm table-fixed">
-      <thead>
-        <tr className="border-b">
-          <th className="text-left p-2">SHA</th>
-          <th className="text-left p-2">Author</th>
-          <th className="text-left p-2 w-2/5">Message</th>
-          <th className="text-left p-2">Score</th>
-          <th className="text-left p-2">Flags</th>
-        </tr>
-      </thead>
-      <tbody>
-        {scanResults.commits.map((c) => (
-          <tr key={c.sha} className="border-b hover:bg-gray-50 transition">
-            <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
-            <td className="p-2">{c.authorName}</td>
-            <td className="p-2 whitespace-normal break-words">{c.message}</td>
-            <td className="p-2">
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
-                  c.risk_score
-                )}`}
-              >
-                {c.risk_score}
-              </span>
-            </td>
-            <td className="p-2 space-x-1 space-y-1">
-      {c.flags?.length ? (
-        c.flags.map((f, i) => (
-          <span
-           key={i}
-              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getFlagColor(f)}`}
-        >
-          {f}
-        </span>
-      ))
-    ) : (
-        "—"
-      )}
-    </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-   </div>  
-  </div>  
-    <footer className="mt-10 text-gray-500 text-sm">
-  Built by Group 1 — Boston University EC521 (2025)
-</footer>
+            <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+              {/* Risk Summary Box */}
+              <div className="mb-6 p-4 rounded-lg bg-gray-50 border">
+                <h3 className="text-lg font-semibold mb-2">Risk Summary</h3>
+                {(() => {
+                  const scores = scanResults.commits.map(c => c.risk_score);
+                  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                  const highest = Math.max(...scores);
+                  const summaryColor =
+                    highest <= 9 ? "text-green-700" :
+                    highest <= 60 ? "text-yellow-700" :
+                    "text-red-700";
+                  return (
+                    <div className={`font-medium ${summaryColor}`}>
+                      <p>Highest Commit Risk: <strong>{highest}</strong></p>
+                      <p>Average Risk Score: <strong>{avg.toFixed(1)}</strong></p>
+                      <p>Total Commits Scanned: <strong>{scores.length}</strong></p>
+                    </div>
+                  );
+                })()}
+              </div>
+              <h3 className="text-xl font-bold mb-4">
+                Scan Results for {scanResults.package}
+              </h3>
+              {scanResults.repo && (
+                <p className="text-gray-700 mb-2">
+                  <strong>Repository:</strong> {scanResults.repo.owner}/{scanResults.repo.repo}
+                </p>
+              )}
+              <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
+              <table className="w-full text-sm table-fixed">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">SHA</th>
+                    <th className="text-left p-2">Author</th>
+                    <th className="text-left p-2 w-2/5">Message</th>
+                    <th className="text-left p-2">Score</th>
+                    <th className="text-left p-2">Flags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scanResults.commits.map((c) => (
+                    <tr key={c.sha} className="border-b hover:bg-gray-50 transition">
+                      <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
+                      <td className="p-2">{c.authorName}</td>
+                      <td className="p-2 whitespace-normal break-words">{c.message}</td>
+                      <td className="p-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
+                            c.risk_score
+                          )}`}
+                        >
+                          {c.risk_score}
+                        </span>
+                      </td>
+                      <td className="p-2 space-x-1 space-y-1">
+                        {c.flags?.length ? (
+                          c.flags.map((f, i) => (
+                            <span
+                              key={i}
+                              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getFlagColor(f)}`}
+                            >
+                              {f}
+                            </span>
+                          ))
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-</div>      
+          <footer className="mt-10 text-gray-500 text-sm">
+            Built by Group 1 — Boston University EC521 (2025)
+          </footer>
+        </div>
+      </div>
+    </div>
   );
 }
 
