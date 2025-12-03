@@ -194,58 +194,73 @@ function App() {
               Error: {scanError}
             </div>
           )}
-
           {scanResults && (
-            <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-4">
-                Scan Results for {scanResults.package}
-              </h3>
-
-              {scanResults.repo && (
-                <p className="text-gray-700 mb-2">
-                  <strong>Repository:</strong> {scanResults.repo.owner}/{scanResults.repo.repo}
-                </p>
-              )}
-
-              <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
-
-              <table className="w-full text-sm table-fixed">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">SHA</th>
-                    <th className="text-left p-2">Author</th>
-                    <th className="text-left p-2 w-2/5">Message</th>
-                    <th className="text-left p-2">Score</th>
-                    <th className="text-left p-2">Flags</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scanResults.commits.map((c) => (
-                    <tr key={c.sha} className="border-b">
-                      <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
-                      <td className="p-2">{c.authorName}</td>
-                      <td className="p-2 whitespace-normal break-words">{c.message}</td>
-                      <td className="p-2">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
-                            c.risk_score
-                          )}`}
-                        >
-                          {c.risk_score}
-                        </span>
-                      </td>
-                      <td className="p-2">
-                        {c.flags?.length ? c.flags.join(", ") : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
+  <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+    <div className="mb-6 p-4 rounded-lg bg-gray-50 border">
+      <h3 className="text-lg font-semibold mb-2">Risk Summary</h3>
+      {(() => {
+        const scores = scanResults.commits.map(c => c.risk_score);
+        const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+        const highest = Math.max(...scores);
+        const summaryColor =
+          highest <= 9 ? "text-green-700" :
+          highest <= 60 ? "text-yellow-700" :
+          "text-red-700";
+        return (
+          <div className={`font-medium ${summaryColor}`}>
+            <p>Highest Commit Risk: <strong>{highest}</strong></p>
+            <p>Average Risk Score: <strong>{avg.toFixed(1)}</strong></p>
+            <p>Total Commits Scanned: <strong>{scores.length}</strong></p>
+          </div>
+        );
+      })()}
     </div>
+    <h3 className="text-xl font-bold mb-4">
+      Scan Results for {scanResults.package}
+    </h3>
+    {scanResults.repo && (
+      <p className="text-gray-700 mb-2">
+        <strong>Repository:</strong> {scanResults.repo.owner}/{scanResults.repo.repo}
+      </p>
+    )}
+    <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
+    <table className="w-full text-sm table-fixed">
+      <thead>
+        <tr className="border-b">
+          <th className="text-left p-2">SHA</th>
+          <th className="text-left p-2">Author</th>
+          <th className="text-left p-2 w-2/5">Message</th>
+          <th className="text-left p-2">Score</th>
+          <th className="text-left p-2">Flags</th>
+        </tr>
+      </thead>
+      <tbody>
+        {scanResults.commits.map((c) => (
+          <tr key={c.sha} className="border-b hover:bg-gray-50 transition">
+            <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
+            <td className="p-2">{c.authorName}</td>
+            <td className="p-2 whitespace-normal break-words">{c.message}</td>
+            <td className="p-2">
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
+                  c.risk_score
+                )}`}
+              >
+                {c.risk_score}
+              </span>
+            </td>
+            <td className="p-2">
+              {c.flags?.length ? c.flags.join(', ') : "—"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+ </div>  
+  </div>    
+</div>      
   );
 }
 
