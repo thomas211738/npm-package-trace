@@ -111,7 +111,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
       <h1 className="text-4xl font-bold text-gray-800 mt-8">NPM Package Malware Detector</h1>
       <div className="flex flex-col items-center w-full mt-16">
-        <div className="w-full max-w-lg px-4">
+        <div className="w-full max-w-7xl px-4">
           <h2 className="text-2xl font-semibold text-gray-700 text-center mb-10">
             Lookup an NPM package to analyze
           </h2>
@@ -203,12 +203,12 @@ function App() {
 
               <h4 className="text-lg font-semibold mt-4 mb-2">Commits:</h4>
 
-              <table className="w-full text-sm table-fixed">
+              <table className="w-full text-sm table-auto">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-2">SHA</th>
                     <th className="text-left p-2">Author</th>
-                    <th className="text-left p-2 w-2/5">Message</th>
+                    <th className="text-left p-2 w-3/5">Message</th>
                     <th className="text-left p-2">Score</th>
                     <th className="text-left p-2">Flags</th>
                   </tr>
@@ -218,9 +218,7 @@ function App() {
                     <tr key={c.sha} className="border-b">
                       <td className="p-2 font-mono">{c.sha.slice(0, 7)}</td>
                       <td className="p-2">{c.authorName}</td>
-                      <td className="p-2 align-top whitespace-normal break-words">
-                          {c.message}
-                      </td>
+                      <td className="p-2 whitespace-normal break-words">{c.message}</td>
                       <td className="p-2">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${getScoreColor(
