@@ -63,6 +63,7 @@ function App() {
 
   const handleSelectPackage = (pkg) => {
     setQuery(pkg.package.name);
+    // We store the whole package object, which usually contains links.repository
     setSelectedPackage(pkg.package);
     setShowDropdown(false);
     setScanResults(null);
@@ -99,6 +100,23 @@ function App() {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearch();
+  };
+
+  // Helper to construct GitHub URL from NPM data
+  const getCommitUrl = (sha) => {
+    if (!selectedPackage?.links?.repository) return null;
+    
+    let url = selectedPackage.links.repository;
+    
+    // Clean up NPM's "git+" prefix or ".git" suffix
+    url = url.replace(/^git\+/, "").replace(/\.git$/, "");
+    
+    // Ensure it's a web URL (sometimes it's just github.com/...)
+    if (!url.startsWith("http")) {
+      url = `https://${url}`;
+    }
+
+    return `${url}/commit/${sha}`;
   };
 
   return (
@@ -262,17 +280,63 @@ function App() {
 
         {activeCommit && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-              <h2 className="text-xl font-bold mb-4">Commit {activeCommit.sha.slice(0, 7)}</h2>
-              <p className="mb-2"><strong>Message:</strong> {activeCommit.message}</p>
-              <p className="mb-2"><strong>Flags:</strong> {activeCommit.flags.join(", ") || "None"}</p>
-              <h3 className="font-semibold mb-2">Diff:</h3>
-              <pre className="bg-gray-900 text-green-200 p-4 rounded-lg text-xs whitespace-pre-wrap overflow-x-auto">
-{activeCommit.diff}
-              </pre>
-              <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => setActiveCommit(null)}>
-                Close
-              </button>
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
+              <h2 className="text-xl font-bold mb-4">Commit Details</h2>
+              
+              <div className="space-y-3">
+                <div>
+                  <span className="font-semibold text-gray-700">SHA:</span>
+                  <span className="ml-2 font-mono bg-gray-100 px-2 py-1 rounded">{activeCommit.sha}</span>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-700">Message:</p>
+                  <p className="mt-1 p-3 bg-gray-50 rounded border text-gray-800">{activeCommit.message}</p>
+                </div>
+
+                <div>
+                   <span className="font-semibold text-gray-700">Flags:</span>
+                   <span className="ml-2">
+                     {activeCommit.flags.length > 0 
+                       ? activeCommit.flags.join(", ") 
+                       : <span className="text-gray-500 italic">None</span>}
+                   </span>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-end space-x-3">
+                <button 
+                  className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" 
+                  onClick={() => setActiveCommit(null)}
+                >
+                  Close
+                </button>
+                
+                {(() => {
+                  const url = getCommitUrl(activeCommit.sha);
+                  return url ? (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+                    >
+                      View on GitHub
+                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <button 
+                      disabled 
+                      className="px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+                      title="Repository URL not available"
+                    >
+                      Repo Link Unavailable
+                    </button>
+                  );
+                })()}
+              </div>
             </div>
           </div>
         )}
