@@ -16,7 +16,7 @@ def score_commit(diff: str):
     d = diff or ""
     lower = d.lower()
 
-    # encoded payloads and eval or Function
+    # encoded payloads and eval or function
     base64_like = re.findall(r"[A-Za-z0-9+/]{30,}={0,2}", d)
     has_hex_blob = re.search(r"0x[0-9a-fA-F]{16,}", d) is not None
     uses_eval = "eval(" in d or "Function(" in d or "new Function" in d
