@@ -1,0 +1,100 @@
+How to Run the Backend
+
+This backend scans npm packages, pulls their recent GitHub commits, and scores them for potential malicious behavior. Here’s how to run it.
+
+1. Navigate to the backend folder
+
+From a terminal, go to:
+
+npm-package-trace/Vantage2/backend
+
+Example path on my machine:
+
+cd /Users/makaylatajalle/Desktop/Github/npm-package-trace/Vantage2/backend
+
+All backend commands must be run inside this folder.
+
+2. Start the server
+
+Run:
+
+node server.js
+
+If it starts correctly, you should see:
+
+Backend listening on http://localhost:3000
+
+Leave this terminal open. Don’t close it while testing.
+
+3. Open a second terminal for testing
+
+Use a new terminal window or tab for running curl commands.
+
+This terminal is for sending requests to the backend.  
+Do NOT run “node server.js” here.
+
+4. Scan an npm package
+
+Use a POST request to the /scan endpoint. Example:
+
+curl -X POST http://localhost:3000/scan \
+  -H "Content-Type: application/json" \
+  -d '{"package":"lodash", "numCommits":5}'
+
+More examples:
+
+colors:
+curl -X POST http://localhost:3000/scan \
+  -H "Content-Type: application/json" \
+  -d '{"package":"colors", "numCommits":10}'
+
+event-stream (older attack, requires deeper history):
+curl -X POST http://localhost:3000/scan \
+  -H "Content-Type: application/json" \
+  -d '{"package":"event-stream", "numCommits":150}'
+
+5. Optional: make the output easier to read
+
+Install jq once:
+
+brew install jq
+
+Then add “| jq” at the end of your curl command:
+
+... | jq
+
+This formats the JSON output so it’s readable.
+
+6. What the output includes
+
+For each commit, the backend returns:
+- the commit SHA
+- author name and email
+- commit message
+- risk_score (0–100)
+- risk_level (low / medium / high)
+- any triggered flags
+
+Flags indicate patterns associated with malicious commits, such as:
+- encoded payloads (base64/hex)
+- eval on encoded content
+- new or modified postinstall scripts
+- child_process calls that download or run code
+- access to .env, .ssh, or credential files
+- infinite loops or sabotage-like behavior
+- sudden new dependencies
+
+7. If curl fails to connect
+
+The backend likely isn’t running.  
+Return to the backend folder and restart it:
+
+cd npm-package-trace/Vantage2/backend
+node server.js
+
+8. Quick summary
+
+• Terminal 1: run the backend (node server.js)  
+• Terminal 2: test it using curl  
+• Always start the backend from the backend folder  
+• Keep the backend terminal open while testing
