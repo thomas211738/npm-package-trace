@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+const [showAdvanced, setShowAdvanced] = useState(false);
+const [commitDepth, setCommitDepth] = useState(10); 
 const getScoreColor = (score) => {
   if (score <= 9) return "bg-green-100 text-green-800";
   if (score <= 60) return "bg-yellow-100 text-yellow-800";
@@ -81,7 +83,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           package: selectedPackage.name,
-          numCommits: 10,
+          numCommits: commitDepth,
         }),
       });
       if (!res.ok) throw new Error(`Backend error: ${res.status}`);
@@ -107,68 +109,95 @@ function App() {
           <h2 className="text-2xl font-semibold text-gray-700 text-center mb-10">
             Lookup an NPM package to analyze
           </h2>
-          <div className="relative mb-10">
-            <div className="flex">
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="e.g., react or express"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => query.length >= 2 && setShowDropdown(true)}
-                onKeyDown={handleKeyDown}
-                className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                onClick={handleSearch}
-                disabled={scanLoading}
-                className="bg-blue-600 text-white px-5 py-3 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {scanLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Scanning...</span>
-                  </div>
-                ) : (
-                  "Scan Package"
-                )}
-              </button>
+<div className="relative mb-10">
+  <div className="flex">
+    <input
+      ref={inputRef}
+      type="text"
+      placeholder="e.g., react or express"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      onFocus={() => query.length >= 2 && setShowDropdown(true)}
+      onKeyDown={handleKeyDown}
+      className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    <button
+      onClick={handleSearch}
+      className="bg-blue-600 text-white px-5 py-3 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      disabled={scanLoading}
+    >
+      {scanLoading ? (
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span>Scanning...</span>
+        </div>
+      ) : (
+        "Scan Package"
+      )}
+    </button>
+  </div>
+
+  {/* ADVANCED OPTIONS */}
+  <div className="mt-4">
+    <button
+      onClick={() => setShowAdvanced(!showAdvanced)}
+      className="text-blue-600 underline text-sm hover:text-blue-800"
+    >
+      {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+    </button>
+
+    {showAdvanced && (
+      <div className="mt-3 p-4 bg-gray-50 border rounded-lg shadow-sm">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Number of commits to scan:
+        </label>
+        <input
+          type="number"
+          min="1"
+          max="100"
+          value={commitDepth}
+          onChange={(e) => setCommitDepth(Number(e.target.value))}
+          className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Default = 10. Increase this if you want deeper historical scanning.
+        </p>
+      </div>
+    )}
+  </div>
+
+  {/* DROPDOWN RESULTS */}
+  {showDropdown && query.length >= 2 && (
+    <div
+      ref={dropdownRef}
+      className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-y-auto"
+    >
+      {isLoading ? (
+        <div className="p-4 text-center text-gray-500">Loading...</div>
+      ) : results.length > 0 ? (
+        results.map((result) => (
+          <div
+            key={result.package.name}
+            onClick={() => handleSelectPackage(result)}
+            className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+          >
+            <div className="font-semibold text-gray-800">
+              {result.package.name}
             </div>
-            {showDropdown && query.length >= 2 && (
-              <div
-                ref={dropdownRef}
-                className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-y-auto"
-              >
-                {isLoading ? (
-                  <div className="p-4 text-center text-gray-500">Loading...</div>
-                ) : results.length > 0 ? (
-                  results.map((result) => (
-                    <div
-                      key={result.package.name}
-                      onClick={() => handleSelectPackage(result)}
-                      className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                    >
-                      <div className="font-semibold text-gray-800">
-                        {result.package.name}
-                      </div>
-                      <div className="text-sm text-gray-600 truncate">
-                        {result.package.description ||
-                          "No description available"}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        v{result.package.version} •{" "}
-                        {result.package.publisher?.username || "Unknown"}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-4 text-center text-gray-500">
-                    No packages found
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="text-sm text-gray-600 truncate">
+              {result.package.description || "No description available"}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              v{result.package.version} • {result.package.publisher?.username || "Unknown"}
+            </div>
           </div>
+        ))
+      ) : (
+        <div className="p-4 text-center text-gray-500">No packages found</div>
+      )}
+    </div>
+  )}
+</div>
           {selectedPackage && (
             <div className="bg-white p-4 rounded-md shadow-md">
               <h3 className="text-lg font-bold text-gray-800 mb-2">
