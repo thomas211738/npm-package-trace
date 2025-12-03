@@ -83,7 +83,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           package: selectedPackage.name,
-          numCommits: commitDepth,
+          numCommits: commitDepth || 10,
         }),
       });
       if (!res.ok) throw new Error(`Backend error: ${res.status}`);
@@ -112,11 +112,20 @@ function App() {
 <div className="relative mb-10">
   <div className="flex">
     <input
-      ref={inputRef}
-      type="text"
-      placeholder="e.g., react or express"
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
+      type="number"
+      min="1"
+      max="100"
+      value={CommitDepth}
+      onChange={(e) => {
+  const val = e.target.value;
+  if (val === "") {
+    setCommitDepth("");
+    return;
+  }
+  setCommitDepth(Number(val));
+}}
+      className="p-2 border rounded-md w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
       onFocus={() => query.length >= 2 && setShowDropdown(true)}
       onKeyDown={handleKeyDown}
       className="flex-grow p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
