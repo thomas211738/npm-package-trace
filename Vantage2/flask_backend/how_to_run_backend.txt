@@ -1,0 +1,109 @@
+HOW TO RUN THE FLASK BACKEND
+
+This backend takes an npm package name, finds its GitHub repo, pulls recent commits, analyzes their diffs, and returns a risk score and flags. The React frontend will call this backend on /scan.
+
+Follow the steps below to run it.
+
+1. Go to the backend folder
+
+Open a terminal and cd into the Flask backend directory:
+
+cd npm-package-trace/Vantage2/flask_backend
+
+All backend commands should be run inside this folder.
+
+2. (Optional) Create a virtual environment
+
+This is recommended so Python dependencies do not interfere with system packages.
+
+python3 -m venv venv
+source venv/bin/activate       (macOS / Linux)
+venv\Scripts\activate          (Windows)
+
+Your terminal prompt will show (venv) if it worked.
+
+3. Install dependencies
+
+Install the required Python packages:
+
+pip install -r requirements.txt
+
+This installs Flask, flask-cors, and requests.
+
+4. (Optional) Set a GitHub token
+
+GitHub rate limits API calls. If you hit limits, set a token:
+
+export GITHUB_TOKEN=your_token_here
+
+This is optional.
+
+5. Start the Flask backend server
+
+Run:
+
+python app.py
+
+If successful, you will see something like:
+
+Running on http://127.0.0.1:5001
+
+Leave this terminal open. Do NOT close it.
+
+6. Test the backend using curl
+
+Open a second terminal window or tab.
+
+Run:
+
+curl -X POST http://localhost:5001/scan \
+  -H "Content-Type: application/json" \
+  -d '{"package":"event-stream", "numCommits":10}'
+
+If you have jq installed, you can pretty print it:
+
+curl -X POST http://localhost:5001/scan \
+  -H "Content-Type: application/json" \
+  -d '{"package":"event-stream", "numCommits":10}' | jq
+
+The backend will respond with:
+- resolved GitHub repo
+- recent commits
+- for each commit:
+  sha
+  author name
+  commit message
+  risk_score (0 to 100)
+  risk_level (low, medium, high)
+  flags (which heuristics fired)
+
+7. How the React frontend uses this backend
+
+The React app will send a POST request to:
+
+http://localhost:5001/scan
+
+with JSON like:
+
+{
+  "package": "colors",
+  "numCommits": 10
+}
+
+The backend returns a JSON object with all commit analysis, which the frontend just displays. The frontend does not run scanning logic.
+
+Example frontend request:
+
+fetch("http://localhost:5001/scan", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ package: "colors", numCommits: 10 })
+})
+
+8. Summary
+
+- Run everything inside flask_backend.
+- Start the backend with: python app.py
+- It runs on http://localhost:5001
+- Use curl to test the /scan endpoint.
+- React will call this same endpoint to show results.

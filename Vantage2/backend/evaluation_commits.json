@@ -1,0 +1,44 @@
+[
+    {
+      "owner": "Marak",
+      "repo": "colors.js",
+      "sha": "137c6dae3339e97f4bbc838c221803c363b0a9fd",
+      "label": "malicious",
+      "note": "colors.js sabotage LIBERTY commit (example placeholder SHA)"
+    },
+    {
+      "owner": "Marak",
+      "repo": "faker.js",
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "label": "malicious",
+      "note": "faker.js sabotage 6.6.6 commit (replace with real SHA)"
+    },
+    {
+      "owner": "dominictarr",
+      "repo": "event-stream",
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "label": "malicious",
+      "note": "event-stream commit adding flatmap-stream (replace with real SHA)"
+    },
+    {
+      "owner": "ua-parser",
+      "repo": "nodejs-useragent",
+      "sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "label": "malicious",
+      "note": "UA-Parser-JS hijacked version (replace with real SHA)"
+    },
+    {
+      "owner": "lodash",
+      "repo": "lodash",
+      "sha": "9648f692b0fc7c2f6a7a763d754377200126c2e8",
+      "label": "benign",
+      "note": "random recent lodash commit"
+    },
+    {
+      "owner": "expressjs",
+      "repo": "express",
+      "sha": "dddddddddddddddddddddddddddddddddddddddd",
+      "label": "benign",
+      "note": "express benign commit"
+    }
+  ]  

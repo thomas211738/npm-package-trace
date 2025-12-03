@@ -83,4 +83,9 @@ async function getRecentCommitsWithDiffs({ owner, repo, n = 10 }) {
   return results;
 }
 
-module.exports = { getRecentCommitsWithDiffs };
+// export getCommitDiff so evaluation script can use it
+module.exports = {
+    getRecentCommitsWithDiffs,
+    getCommitDiff
+  };
+  
