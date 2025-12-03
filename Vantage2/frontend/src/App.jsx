@@ -194,9 +194,19 @@ function App() {
               Error: {scanError}
             </div>
           )}
+          <div className="mb-6 p-4 bg-gray-50 border rounded-md">
+  <h4 className="font-semibold text-gray-800 text-lg mb-2">Risk Summary</h4>
 
-          {scanResults && (
-            <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+  <p><strong>Total Commits:</strong> {scanResults.commits.length}</p>
+  <p>
+    <strong>Commits with Flags:</strong>{" "}
+    {scanResults.commits.filter(c => c.flags?.length).length}
+  </p>
+  <p>
+    <strong>Highest Risk Score:</strong>{" "}
+    {Math.max(...scanResults.commits.map(c => c.risk_score))}
+  </p>
+</div>
               <h3 className="text-xl font-bold mb-4">
                 Scan Results for {scanResults.package}
               </h3>
