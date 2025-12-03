@@ -71,14 +71,16 @@ def scan_package():
         score_info = score_commit(diff)
 
         result_commits.append({
-            "sha": c["sha"],
-            "authorName": c["authorName"],
-            "authorEmail": c["authorEmail"],
-            "message": c["message"],
-            "risk_score": score_info["score"],
-            "risk_level": score_info["level"],
-            "flags": score_info["flags"]
-        })
+    "sha": c["sha"],
+    "authorName": c["authorName"],
+    "authorEmail": c["authorEmail"],
+    "message": c["message"],
+    "diff": diff,   
+    "risk_score": score_info["score"],
+    "risk_level": score_info["level"],
+    "flags": score_info["flags"]
+})
+
 
     # return combined JSON
     return jsonify({
