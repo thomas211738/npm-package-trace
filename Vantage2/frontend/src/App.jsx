@@ -63,7 +63,6 @@ function App() {
 
   const handleSelectPackage = (pkg) => {
     setQuery(pkg.package.name);
-    // We store the whole package object, which usually contains links.repository
     setSelectedPackage(pkg.package);
     setShowDropdown(false);
     setScanResults(null);
@@ -102,20 +101,13 @@ function App() {
     if (e.key === "Enter") handleSearch();
   };
 
-  // Helper to construct GitHub URL from NPM data
   const getCommitUrl = (sha) => {
     if (!selectedPackage?.links?.repository) return null;
-    
     let url = selectedPackage.links.repository;
-    
-    // Clean up NPM's "git+" prefix or ".git" suffix
     url = url.replace(/^git\+/, "").replace(/\.git$/, "");
-    
-    // Ensure it's a web URL (sometimes it's just github.com/...)
     if (!url.startsWith("http")) {
       url = `https://${url}`;
     }
-
     return `${url}/commit/${sha}`;
   };
 
@@ -219,18 +211,33 @@ function App() {
 
         {scanResults && (
           <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
+            {/* Modified Risk Summary Section */}
             <div className="mb-6 p-4 bg-gray-50 border rounded-lg">
               <h3 className="font-semibold mb-2">Risk Summary</h3>
               {(() => {
                 const scores = scanResults.commits.map((c) => c.risk_score);
                 const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
                 const highest = Math.max(...scores);
+                
+                // Determine color and if the image should be shown
                 const color = highest <= 9 ? "text-green-700" : highest <= 60 ? "text-yellow-700" : "text-red-700";
+                const showWarningImage = highest > 60;
+
                 return (
-                  <div className={`font-medium ${color}`}>
-                    <p>Highest Commit Risk: <strong>{highest}</strong></p>
-                    <p>Average Risk Score: <strong>{avg.toFixed(1)}</strong></p>
-                    <p>Total Commits Scanned: <strong>{scores.length}</strong></p>
+                  <div className={`font-medium ${color} flex justify-between items-center`}>
+                    <div>
+                      <p>Highest Commit Risk: <strong>{highest}</strong></p>
+                      <p>Average Risk Score: <strong>{avg.toFixed(1)}</strong></p>
+                      <p>Total Commits Scanned: <strong>{scores.length}</strong></p>
+                    </div>
+                    {/* Image conditional */}
+                    {showWarningImage && (
+                      <img 
+                        src="/assets/man_shooting.png" 
+                        alt="High risk detected" 
+                        className="h-24 w-auto object-contain ml-4"
+                      />
+                    )}
                   </div>
                 );
               })()}
