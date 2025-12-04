@@ -21,7 +21,7 @@ from risk.score_commit import score_commit
 
 
 app = Flask(__name__)
-CORS(app)  # allow your react frontend on a different port to call this
+CORS(app)
 
 
 @app.route("/health", methods=["GET"])
@@ -176,9 +176,9 @@ def scan():
         # cap score + recompute level
         score = min(score, 100)
 
-        if score >= 70:
+        if score >= 61:
             level = "high"
-        elif score >= 30:
+        elif score >= 10:
             level = "medium"
         else:
             level = "low"
@@ -186,16 +186,19 @@ def scan():
         flags = sorted(set(flags))
 
         results.append(
-            {
-                "sha": sha,
-                "authorName": author_name,
-                "authorEmail": author_email,
-                "message": message,
-                "risk_score": score,
-                "risk_level": level,
-                "flags": flags,
-            }
-        )
+        {
+            "sha": sha,
+            "authorName": author_name,
+            "authorEmail": author_email,
+            "date": date_str,
+            "authorDate": date_str,
+            "message": message,
+            "risk_score": score,
+            "risk_level": level,
+            "flags": flags,
+        }
+    )
+
 
     return jsonify(
         {

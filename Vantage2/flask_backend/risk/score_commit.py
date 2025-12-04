@@ -1,4 +1,4 @@
-# heuristic-based risk scoring for a single commit diff,his is where we encode what we've seen in real npm attacks:
+# heuristic-based risk scoring for a single commit diff, this is where we encode what we've seen in real npm attacks:
 # - encoded payloads + eval
 # - suspicious postinstall scripts
 # - child_process + curl/wget
@@ -85,9 +85,9 @@ def score_commit(diff: str):
     # cap total score at 100
     score = min(score, 100)
 
-    if score >= 70:
+    if score >= 61:
         level = "high"
-    elif score >= 30:
+    elif score >= 10:
         level = "medium"
     else:
         level = "low"
